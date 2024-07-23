@@ -1,0 +1,99 @@
+### Step 1: Load the dataset
+
+First, let's load the Bank Marketing dataset.
+
+```python
+import pandas as pd
+
+# Load the dataset
+url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank-additional-full.csv'
+df = pd.read_csv(url, delimiter=';')
+
+# Display the first few rows of the dataset
+df.head()
+```
+
+### Step 2: Inspect and clean the data
+
+Inspect the data to understand its structure and identify any missing values or anomalies.
+
+```python
+# Display basic information about the dataset
+df.info()
+
+# Display summary statistics
+df.describe()
+
+# Check for missing values
+missing_values = df.isnull().sum()
+print(missing_values)
+```
+
+### Step 3: Preprocess the data
+
+Encode categorical variables, split the data into features and target, and then into training and testing sets.
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Encode categorical variables
+categorical_columns = df.select_dtypes(include=['object']).columns
+
+# Apply LabelEncoder to each categorical column
+label_encoders = {}
+for column in categorical_columns:
+    label_encoders[column] = LabelEncoder()
+    df[column] = label_encoders[column].fit_transform(df[column])
+
+# Split the data into features (X) and target (y)
+X = df.drop('y', axis=1)
+y = df['y']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+### Step 4: Train a decision tree classifier
+
+Train the decision tree classifier using the training data.
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+
+# Initialize the decision tree classifier
+clf = DecisionTreeClassifier(random_state=42)
+
+# Train the classifier
+clf.fit(X_train, y_train)
+```
+
+### Step 5: Evaluate the model's performance
+
+Evaluate the model using accuracy, precision, recall, and the confusion matrix.
+
+```python
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix, classification_report
+
+# Predict on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate evaluation metrics
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, pos_label=1)
+recall = recall_score(y_test, y_pred, pos_label=1)
+
+# Display the results
+print(f'Accuracy: {accuracy:.2f}')
+print(f'Precision: {precision:.2f}')
+print(f'Recall: {recall:.2f}')
+
+# Display the classification report
+print('\nClassification Report:')
+print(classification_report(y_test, y_pred))
+
+# Display the confusion matrix
+print('\nConfusion Matrix:')
+print(confusion_matrix(y_test, y_pred))
+```
+
